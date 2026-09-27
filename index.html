@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APP CÀY XU ĐỔI QUÀ - FIREBASE SERVER</title>
+  
+  <!-- SDK FIREBASE REALTIME DATABASE -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
+    body { background: #0a0a0f; color: #fff; padding: 12px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 450px; }
+    
+    .title-app { 
+      font-size: 20px; font-weight: 900; 
+      background: linear-gradient(45deg, #ffeb3b, #ff9800); 
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+      text-align: center; margin-bottom: 4px; text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .sub-title { 
+      font-size: 13px; color: #00e676; text-align: center; margin-bottom: 14px; 
+      font-weight: 800; text-shadow: 0 0 8px rgba(0, 230, 118, 0.4); 
+    }
+    
+    .stat-card { 
+      background: linear-gradient(135deg, #14141f, #1e1e2e); 
+      border: 1px solid #00bcd4; padding: 12px; border-radius: 14px; 
+      text-align: center; margin-bottom: 14px; 
+      box-shadow: 0 0 15px rgba(0, 188, 212, 0.2); 
+    }
+    .user-id { font-size: 13px; color: #00bcd4; font-weight: bold; margin-bottom: 4px; }
+    .user-name { font-size: 14px; color: #ffeb3b; font-weight: bold; margin-bottom: 6px; }
+    .stat-row { font-size: 15px; font-weight: bold; color: #ffca28; }
+
+    .notify-box { 
+      background: linear-gradient(90deg, #2b2200, #1a1500); 
+      border-left: 4px solid #ffd700; color: #ffd700; padding: 10px 14px; 
+      border-radius: 8px; font-size: 13px; margin-bottom: 14px; 
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); 
+    }
+
+    .nav-tabs {
+      display: flex; gap: 4px; margin-bottom: 14px; background: #14141f; 
+      padding: 6px; border-radius: 12px; border: 1px solid #2a2a3d;
+      overflow-x: auto;
+    }
+    .nav-btn {
+      flex: 1; min-width: 65px; padding: 8px 2px; font-size: 10px; font-weight: bold; 
+      background: transparent; color: #aaa; border: none; border-radius: 8px; 
+      cursor: pointer; text-transform: uppercase; transition: all 0.2s; white-space: nowrap;
+    }
+    .nav-btn.active {
+      background: linear-gradient(135deg, #ff9800, #f57c00); color: #fff;
+      box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4);
+    }
+
+    .card { 
+      background: linear-gradient(180deg, #161622, #10101a); 
+      border: 1px solid #2a2a3d; padding: 16px; border-radius: 16px; 
+      margin-bottom: 14px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6); 
+      display: none;
+    }
+    .card.active-tab { display: block; }
+    .card-title { 
+      font-size: 14px; font-weight: 800; color: #ff9800; margin-bottom: 12px; 
+      text-transform: uppercase; border-bottom: 1px solid #2a2a3d; padding-bottom: 6px; 
+      letter-spacing: 0.5px;
+    }
+
+    .survey-box { 
+      background: #0d0d14; padding: 14px; border-radius: 10px; 
+      border: 1px solid #00e676; box-shadow: 0 0 12px rgba(0, 230, 118, 0.25); 
+      text-align: center; margin-bottom: 10px; 
+    }
+    .timer-text { font-size: 13px; color: #00e676; margin-top: 6px; font-weight: bold; }
+
+    input, select { 
+      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #3d3d56; 
+      background: #0a0a10; color: #fff; margin-bottom: 10px; outline: none; 
+      font-size: 14px; transition: 0.2s;
+    }
+    input:focus, select:focus { border-color: #ff9800; box-shadow: 0 0 8px rgba(255, 152, 0, 0.4); }
+
+    button { 
+      width: 100%; padding: 12px; border: none; border-radius: 8px; 
+      font-weight: bold; font-size: 14px; cursor: pointer; margin-bottom: 8px; 
+      transition: all 0.2s; 
+    }
+    button:active { transform: scale(0.97); }
+    
+    .btn-opt { 
+      background: #1a1a28; color: #fff; border: 1px solid #33334d; 
+      text-align: left; padding: 12px; display: block; border-radius: 8px;
+    }
+    .btn-opt:hover { border-color: #ff9800; background: #222235; }
+    
+    .btn-code { 
+      background: linear-gradient(135deg, #00c853, #009624); color: #fff; 
+      box-shadow: 0 4px 12px rgba(0, 200, 83, 0.3); 
+    }
+    .btn-redeem { 
+      background: linear-gradient(135deg, #ff1744, #d50000); color: #fff; 
+      box-shadow: 0 4px 12px rgba(255, 23, 68, 0.3); 
+    }
+    .btn-music {
+      background: linear-gradient(135deg, #e91e63, #9c27b0); color: #fff;
+      box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+    }
+    .btn-delete {
+      background: linear-gradient(135deg, #d32f2f, #b71c1c); color: #fff;
+      box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4); margin-top: 15px;
+    }
+    .btn-disabled { 
+      background: #2a2a38 !important; color: #666680 !important; 
+      border: 1px solid #3a3a4d !important; cursor: not-allowed; 
+    }
+
+    /* TAP XU STYLES */
+    .tap-area {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 10px 0;
+    }
+    .tap-button {
+      width: 170px; height: 170px; border-radius: 50%;
+      background: radial-gradient(circle, #ffe082 0%, #ff1744 100%);
+      border: 6px solid #ffd54f;
+      box-shadow: 0 0 25px rgba(255, 213, 79, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.8);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; transition: transform 0.05s, box-shadow 0.05s;
+      margin: 15px 0; outline: none; -webkit-tap-highlight-color: transparent;
+    }
+    .tap-button:active, .tap-button.active-press {
+      transform: scale(0.92);
+      box-shadow: 0 0 10px rgba(255, 213, 79, 0.9), inset 0 0 25px rgba(0, 0, 0, 0.4);
+    }
+    .tap-title { font-size: 26px; font-weight: 900; color: #fff; text-shadow: 0 2px 4px #000; }
+    .tap-sub { font-size: 22px; font-weight: 900; color: #fff7c0; text-shadow: 0 2px 4px #000; }
+    
+    .tap-info-box {
+      background: #0d0d14; border: 1px solid #ff9800; border-radius: 12px;
+      padding: 10px; width: 100%; text-align: center; margin-bottom: 12px;
+    }
+
+    .music-player {
+      background: #0d0d14; border: 1px solid #e91e63;
+      border-radius: 12px; padding: 12px; text-align: center; margin-top: 10px;
+    }
+    .song-title {
+      font-size: 13px; font-weight: bold; color: #ff4081; margin-bottom: 10px;
+    }
+    .video-container {
+      position: relative; width: 100%; padding-bottom: 56.25%; height: 0;
+      border-radius: 8px; overflow: hidden; margin-bottom: 10px; border: 1px solid #333;
+    }
+    .video-container iframe {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
+    }
+    
+    .footer-note { font-size: 11px; color: #8888a0; text-align: center; margin-top: 14px; line-height: 1.6; }
+    .zalo-link {
+      color: #00e676; font-weight: bold; text-decoration: underline; cursor: pointer; display: inline-block; padding: 4px;
+    }
+    .server-status {
+      font-size: 11px; color: #00e676; font-weight: bold; margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="title-app">APP CÀY XU ĐỔI QUÀ BẰNG CÁCH</div>
+    <div class="sub-title">CÀY KHẢO SÁT CỰC NHANH</div>
+
+    <div class="notify-box" id="notifyBox">📢 Thông báo: ĐỀU LÀ THẬT! Chúc các bạn cày xu vui vẻ.</div>
+
+    <div class="stat-card">
+      <div class="server-status">🟢 ĐÃ KẾT NỐI MÁY CHỦ REALTIME FIREBASE</div>
+      <div class="user-name">TÊN: <span id="userNameDisplay">Chưa đặt tên</span></div>
+      <div class="user-id">ID: <span id="userIdDisplay">Loading...</span></div>
+      <div class="stat-row">XU CHÍNH: <span id="xuDisplay">0</span> | KHẢO SÁT: <span id="surveyDoneDisplay">0</span></div>
+      <div style="font-size: 14px; font-weight: bold; color: #ff4081; margin-top: 4px;">
+        👉 XU TAP RÊNG: <span id="tapXuDisplay">0</span>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-btn active" onclick="switchTab('tabSurvey', this)">📝 Khảo Sát</button>
+      <button class="nav-btn" onclick="switchTab('tabTap', this)">👆 TAP XU</button>
+      <button class="nav-btn" onclick="switchTab('tabRedeem', this)">🎁 Đổi Quà</button>
+      <button class="nav-btn" onclick="switchTab('tabCode', this)">🔑 Code</button>
+      <button class="nav-btn" onclick="switchTab('tabMusic', this)">🎵 Nhạc</button>
+      <button class="nav-btn" onclick="switchTab('tabSetting', this)">⚙️ Cài Đặt</button>
+    </div>
+
+    <!-- 1. MỤC KHẢO SÁT -->
+    <div class="card active-tab" id="tabSurvey">
+      <div class="card-title">MỤC KHẢO SÁT & VƯỢT LINK</div>
+      <button class="btn-code" style="background: linear-gradient(135deg, #00b0ff, #0081cb); margin-bottom: 15px; font-size: 13px;" onclick="handleVuotLink()">
+        🚀 VƯỢT LINK ỦNG HỘ TẶNG +20.000 XU CHÍNH
+      </button>
+
+      <div id="surveyContainer">
+        <div class="survey-box">
+          <p id="surveyQuestion" style="font-weight: bold;">Đang tải khảo sát...</p>
+          <div class="timer-text" id="timerDisplay">Sẵn sàng!</div>
+        </div>
+        <div id="surveyAnswers"></div>
+      </div>
+    </div>
+
+    <!-- 2. MỤC TAP XU -->
+    <div class="card" id="tabTap">
+      <div class="card-title">MỤC TAP XU (MÁY CHỦ DỮ LIỆU)</div>
+      
+      <div class="tap-info-box">
+        <div style="font-size: 13px; color: #aaa;">Mỗi lần Tap nhận được: <b id="tapPowerText" style="color: #00e676;">+1</b> Xu TAP</div>
+        <div style="font-size: 13px; color: #aaa; margin-top: 4px;">Sức mạnh Tap hiện tại: <b id="tapLevelText" style="color: #ffca28;">Cấp +1</b> (Tối đa +90394)</div>
+        <div style="font-size: 11px; color: #888; margin-top: 4px;">💡 Mẹo OTG: Đè phím <b>ENTER</b> để đè Tap liên tục!</div>
+      </div>
+
+      <div class="tap-area">
+        <div class="tap-button" id="mainTapBtn" tabindex="0" onclick="handleTapClick()">
+          <span class="tap-title">TAP</span>
+          <span class="tap-sub">XU</span>
+        </div>
+      </div>
+
+      <button class="btn-code" style="background: linear-gradient(135deg, #ff9800, #e65100); margin-bottom: 10px;" id="upgradeBtn" onclick="upgradeTapPower()">
+        ⚡ NÂNG CẤP TAP (+1) - GIÁ: <span id="upgradeCostText">1,000</span> XU TAP
+      </button>
+
+      <div style="border-top: 1px dashed #3a3a4d; margin: 12px 0; padding-top: 10px;">
+        <div style="font-size: 13px; font-weight: bold; color: #00e676; margin-bottom: 8px; text-align: center;">
+          🔄 ĐỔI XU TAP SANG XU APP CHÍNH (100 Xu TAP = 5 Xu Chính)
+        </div>
+        <button class="btn-code" style="background: linear-gradient(135deg, #00e676, #00a152);" onclick="convertTapToMainXu()">
+          🔁 ĐỔI TOÀN BỘ XU TAP SANG XU CHÍNH
+        </button>
+      </div>
+
+      <div style="border-top: 1px dashed #3a3a4d; margin: 12px 0; padding-top: 10px;">
+        <div style="font-size: 13px; font-weight: bold; color: #ffeb3b; margin-bottom: 6px;">🔑 MÃ CODE TAP XU:</div>
+        <input type="text" id="tapCodeInput" placeholder="Nhập code Tap Xu (VD: TANTHU36)...">
+        <button class="btn-code" onclick="nhapTapCode()">NHẬP CODE TAP XU</button>
+      </div>
+    </div>
+
+    <!-- 3. MỤC ĐỔI QUÀ -->
+    <div class="card" id="tabRedeem">
+      <div class="card-title">MỤC ĐỔI QUÀ (BẰNG XU CHÍNH)</div>
+      <p style="font-size: 12px; color: #aaa; margin-bottom: 8px;">VUI LÒNG CHỌN 1 TRONG 3 GAME</p>
+      
+      <select id="gameSelect" onchange="changeGame()">
+        <option value="ff">FREE FIRE</option>
+        <option value="lq">LIÊN QUÂN (BẢO TRÌ)</option>
+        <option value="roblox">ROBLOX</option>
+      </select>
+
+      <div id="ffSection">
+        <input type="text" id="ffIdInput" placeholder="VUI LÒNG NHẬP ID FREE FIRE">
+        <button class="btn-redeem" onclick="redeemReward('200KC', 20000, 'ff')">200KC = 20.000 XU CHÍNH</button>
+        <button class="btn-redeem" onclick="redeemReward('500KC', 45555, 'ff')">500KC = 45.555 XU CHÍNH</button>
+        <button class="btn-redeem" onclick="redeemReward('1000KC', 99999, 'ff')">1000KC = 99.999 XU CHÍNH</button>
+        <button class="btn-redeem" onclick="redeemReward('4000KC', 299800, 'ff')">4000KC = 299.800 XU CHÍNH</button>
+      </div>
+
+      <div id="lqSection" style="display: none;">
+        <button class="btn-disabled" disabled>LIÊN QUÂN HIỆN ĐANG BẢO TRÌ!</button>
+      </div>
+
+      <div id="robloxSection" style="display: none;">
+        <input type="text" id="robloxIdInput" placeholder="VUI LÒNG NHẬP ID ROBLOX">
+        <button class="btn-redeem" style="background: linear-gradient(135deg, #00bcd4, #00838f);" onclick="redeemReward('100 ROBUX', 6666, 'roblox')">100 ROBUX = 6.666 XU CHÍNH</button>
+        <button class="btn-redeem" style="background: linear-gradient(135deg, #00bcd4, #00838f);" onclick="redeemReward('1000 ROBUX', 20939, 'roblox')">1000 ROBUX = 20.939 XU CHÍNH</button>
+        <button class="btn-redeem" style="background: linear-gradient(135deg, #00bcd4, #00838f);" onclick="redeemReward('5000 ROBUX', 50000, 'roblox')">5000 ROBUX = 50.000 XU CHÍNH</button>
+      </div>
+
+      <div style="font-size: 11px; color: #00e676; margin-top: 8px; text-align: center; font-weight: bold;">
+        PHẦN THƯỞNG TỰ ĐỘNG GỬI LÊN MÁY CHỦ DUYỆT CỰC NHANH
+      </div>
+    </div>
+
+    <!-- 4. MỤC CODE CHÍNH -->
+    <div class="card" id="tabCode">
+      <div class="card-title">MỤC CODE APP CHÍNH</div>
+      <input type="text" id="codeInput" placeholder="NHẬP CODE TẠI ĐÂY...">
+      <button class="btn-code" onclick="nhapCode()">NHẬP CODE XU CHÍNH</button>
+    </div>
+
+    <!-- 5. MỤC PHÁT NHẠC YOUTUBE -->
+    <div class="card" id="tabMusic">
+      <div class="card-title">MỤC PHÁT NHẠC YOUTUBE</div>
+      <label style="font-size: 12px; color: #aaa; margin-bottom: 6px; display: block;">CHỌN BÀI HÁT YOUTUBE:</label>
+      <select id="musicSelect" onchange="changeTrack()">
+        <option value="0">1. Tao Có Ông Anh Văn Hiệp</option>
+        <option value="1">2. Nhạc Chill</option>
+        <option value="2">3. Nhạc Dành Cho Lớp</option>
+      </select>
+
+      <div class="music-player">
+        <div class="song-title" id="songTitleDisplay">🎵 1. Tao Có Ông Anh Văn Hiệp</div>
+        <div class="video-container">
+          <iframe id="youtubeIframe" src="https://www.youtube.com/embed/ND04Rg7fl6M?enablejsapi=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+        <button class="btn-music" onclick="nextTrack()">⏭️ BÀI TIẾP THEO</button>
+      </div>
+    </div>
+
+    <!-- 6. CÀI ĐẶT & ĐỔI TÊN -->
+    <div class="card" id="tabSetting">
+      <div class="card-title">⚙️ CÀI ĐẶT TÀI KHOẢN</div>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="font-size: 12px; color: #ffeb3b; font-weight: bold;">ĐỔI TÊN TÀI KHOẢN CỦA BẠN:</label>
+        <input type="text" id="changeNameInput" placeholder="Nhập tên mới...">
+        <button class="btn-code" style="background: linear-gradient(135deg, #00b0ff, #0081cb);" onclick="updateUserName()">💾 LƯU TÊN MỚI</button>
+      </div>
+
+      <div style="border-top: 1px solid #3a3a4d; padding-top: 15px;">
+        <p style="font-size: 12px; color: #aaa; margin-bottom: 12px;">Cảnh báo: Xóa tài khoản sẽ làm mất toàn bộ Xu trên Máy Chủ vĩnh viễn!</p>
+        <button class="btn-delete" onclick="deleteAccountPermanent()">❌ XÓA TÀI KHOẢN VĨNH VIỄN</button>
+      </div>
+    </div>
+
+    <!-- FOOTER LINK ZALO -->
+    <div class="footer-note">
+      ĐỀU LÀ THẬT<br>
+      © @Admin Nguyên Khang | 
+      <span class="zalo-link" onclick="openZaloGroup()">
+        👉 Nhấn vào đây để vào Nhóm Zalo ngay 👈
+      </span>
+    </div>
+
+  </div>
+
+  <script>
+    // --- 1. KẾT NỐI MÁY CHỦ FIREBASE REALTIME DATABASE ---
+    const firebaseConfig = {
+      databaseURL: "https://caydiem-c8cc7-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+
+    // --- 2. KHỞI TẠO TÀI KHOẢN KẾT NỐI MÁY CHỦ ---
+    let localUserId = localStorage.getItem('nk_user_id');
+    if (!localUserId) {
+      localUserId = 'nk-' + Math.floor(100000 + Math.random() * 900000) + '-' + Math.floor(Math.random() * 10);
+      localStorage.setItem('nk_user_id', localUserId);
+    }
+
+    let currentUser = {
+      id: localUserId,
+      name: localStorage.getItem('nk_user_name') || "Chưa đặt tên",
+      xu: 0,
+      tapXu: 0,
+      tapPower: 1,
+      surveyDone: 0,
+      usedCodes: [],
+      usedTapCodes: []
+    };
+
+    // Đọc dữ liệu Realtime từ Máy Chủ Firebase
+    db.ref('users/' + currentUser.id).on('value', (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        currentUser.name = data.name || currentUser.name;
+        currentUser.xu = data.xu || 0;
+        currentUser.tapXu = data.tapXu || 0;
+        currentUser.tapPower = data.tapPower || 1;
+        currentUser.surveyDone = data.surveyDone || 0;
+        currentUser.usedCodes = data.usedCodes || [];
+        currentUser.usedTapCodes = data.usedTapCodes || [];
+      } else {
+        // Tạo mới dữ liệu lên máy chủ
+        syncDataToFirebase();
+      }
+      updateUI();
+    });
+
+    function syncDataToFirebase() {
+      db.ref('users/' + currentUser.id).set({
+        id: currentUser.id,
+        name: currentUser.name,
+        xu: currentUser.xu,
+        tapXu: currentUser.tapXu,
+        tapPower: currentUser.tapPower,
+        surveyDone: currentUser.surveyDone,
+        usedCodes: currentUser.usedCodes,
+        usedTapCodes: currentUser.usedTapCodes,
+        lastOnline: new Date().toLocaleString("vi-VN")
+      });
+    }
+
+    function updateUI() {
+      document.getElementById('userIdDisplay').innerText = currentUser.id;
+      document.getElementById('userNameDisplay').innerText = currentUser.name;
+      document.getElementById('xuDisplay').innerText = currentUser.xu.toLocaleString();
+      document.getElementById('tapXuDisplay').innerText = currentUser.tapXu.toLocaleString();
+      document.getElementById('surveyDoneDisplay').innerText = currentUser.surveyDone;
+
+      document.getElementById('tapPowerText').innerText = `+${currentUser.tapPower.toLocaleString()}`;
+      document.getElementById('tapLevelText').innerText = `Cấp +${currentUser.tapPower.toLocaleString()}`;
+      
+      let cost = currentUser.tapPower * 1000;
+      document.getElementById('upgradeCostText').innerText = cost.toLocaleString();
+    }
+
+    function updateUserName() {
+      let newName = document.getElementById('changeNameInput').value.trim();
+      if (!newName) return alert("VUI LÒNG NHẬP TÊN MỚI!");
+      currentUser.name = newName;
+      localStorage.setItem('nk_user_name', newName);
+      syncDataToFirebase();
+      alert(`ĐÃ CẬP NHẬT TÊN MỚI THÀNH CÔNG: ${newName}`);
+      document.getElementById('changeNameInput').value = '';
+    }
+
+    // --- 3. TAB CHUYỂN TAB VÀ LINK ZALO ---
+    function switchTab(tabId, btnElement) {
+      document.querySelectorAll('.card').forEach(card => card.classList.remove('active-tab'));
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active-tab');
+      btnElement.classList.add('active');
+    }
+
+    function openZaloGroup() {
+      window.open("https://zalo.me/g/whkwye2xe5cvfrj338ag", '_blank');
+    }
+
+    // --- 4. LOGIC TAP XU VÀ ĐÈ PHÍM ENTER OTG ---
+    const mainTapBtn = document.getElementById('mainTapBtn');
+    let isHoldingEnter = false;
+    let enterInterval = null;
+
+    function handleTapClick() {
+      currentUser.tapXu += currentUser.tapPower;
+      updateUI();
+      // Đẩy Tap Xu lên máy chủ Firebase
+      db.ref('users/' + currentUser.id).update({
+        tapXu: currentUser.tapXu
+      });
+    }
+
+    // Đè phím Enter OTG
+    document.addEventListener('keydown', function(event) {
+      let activeTab = document.getElementById('tabTap');
+      if (activeTab && activeTab.classList.contains('active-tab')) {
+        if (event.key === 'Enter' || event.keyCode === 13) {
+          event.preventDefault();
+          if (!isHoldingEnter) {
+            isHoldingEnter = true;
+            mainTapBtn.classList.add('active-press');
+            handleTapClick();
+            enterInterval = setInterval(() => {
+              handleTapClick();
+            }, 50); // 20 lần tap/s
+          }
+        }
+      }
+    });
+
+    document.addEventListener('keyup', function(event) {
+      if (event.key === 'Enter' || event.keyCode === 13) {
+        isHoldingEnter = false;
+        mainTapBtn.classList.remove('active-press');
+        clearInterval(enterInterval);
+      }
+    });
+
+    function upgradeTapPower() {
+      if (currentUser.tapPower >= 90394) return alert("Bạn đã đạt cấp độ Nâng Cấp TAP TỐI ĐA (+90,394)!");
+      let cost = currentUser.tapPower * 1000;
+      if (currentUser.tapXu < cost) return alert(`Cần ${cost.toLocaleString()} Xu TAP để nâng cấp!`);
+
+      currentUser.tapXu -= cost;
+      currentUser.tapPower += 1;
+      syncDataToFirebase();
+      alert(`NÂNG CẤP THÀNH CÔNG! Sức mạnh Tap hiện tại: +${currentUser.tapPower.toLocaleString()}`);
+    }
+
+    function convertTapToMainXu() {
+      if (currentUser.tapXu < 100) return alert("Bạn cần ít nhất 100 Xu TAP để đổi!");
+      let tapToConvert = currentUser.tapXu;
+      let convertedMainXu = Math.floor(tapToConvert / 100) * 5;
+      let usedTapXu = Math.floor(tapToConvert / 100) * 100;
+
+      currentUser.tapXu -= usedTapXu;
+      currentUser.xu += convertedMainXu;
+      syncDataToFirebase();
+      alert(`ĐỔI THÀNH CÔNG! Đã chuyển ${usedTapXu.toLocaleString()} Xu TAP ➡️ +${convertedMainXu.toLocaleString()} Xu Chính!`);
+    }
+
+    function nhapTapCode() {
+      let code = document.getElementById('tapCodeInput').value.trim().toUpperCase();
+      if (!code) return alert("VUI LÒNG NHẬP MÃ CODE TAP XU!");
+      if (currentUser.usedTapCodes.includes(code)) return alert("Mã code này bạn đã nhập rồi!");
+
+      if (code === "TANTHU36") {
+        currentUser.tapXu += 100000;
+        currentUser.usedTapCodes.push(code);
+        syncDataToFirebase();
+        alert("Chúc mừng! Bạn đã nhận +100.000 XU TAP từ code 'TANTHU36'!");
+        document.getElementById('tapCodeInput').value = '';
+      } else {
+        alert("Mã code Tap Xu không đúng!");
+      }
+    }
+
+    // --- 5. LOGIC KHẢO SÁT & VƯỢT LINK ---
+    const surveyList = [
+      { question: "1 + 1 = ?", answers: [{ text: "2 (Nhận 1.000 Xu)", xu: 1000 }, { text: "3 (0 Xu)", xu: 0 }] },
+      { question: "ADMIN BÁ KHÍ KHÔNG?", answers: [{ text: "CÓ (Nhận 4.000 Xu)", xu: 4000 }, { text: "KHÔNG (0 Xu)", xu: 0 }] },
+      { question: "BẠN THÍCH KEM ĐÁNH RĂNG NÀO?", answers: [{ text: "KEM PỊA BÒ (1.000 Xu)", xu: 1000 }, { text: "KEM PỊA TRÂU (1.000 Xu)", xu: 1000 }] }
+    ];
+
+    let timerInterval = null;
+    let isWaiting = false;
+
+    function renderSurvey() {
+      let randomIndex = Math.floor(Math.random() * surveyList.length);
+      let currentSurvey = surveyList[randomIndex];
+      document.getElementById('surveyQuestion').innerText = currentSurvey.question;
+      let answersHTML = "";
+      currentSurvey.answers.forEach(ans => {
+        answersHTML += `<button class="btn-opt" onclick="completeSurvey(${ans.xu})">👉 ${ans.text}</button>`;
+      });
+      document.getElementById('surveyAnswers').innerHTML = answersHTML;
+    }
+
+    function startCooldown25s() {
+      isWaiting = true;
+      let timeLeft = 25;
+      document.getElementById('surveyQuestion').innerText = "Đang chờ khảo sát tiếp theo...";
+      document.getElementById('surveyAnswers').innerHTML = `<button class="btn-disabled" disabled>Đang đếm ngược 25s...</button>`;
+
+      timerInterval = setInterval(() => {
+        document.getElementById('timerDisplay').innerText = `Khảo sát mới sau: ${timeLeft}s`;
+        timeLeft--;
+        if (timeLeft < 0) {
+          clearInterval(timerInterval);
+          isWaiting = false;
+          document.getElementById('timerDisplay').innerText = `Sẵn sàng!`;
+          renderSurvey();
+        }
+      }, 1000);
+    }
+
+    function completeSurvey(xuBonus) {
+      if (isWaiting) return;
+      if (xuBonus > 0) {
+        currentUser.xu += xuBonus;
+        currentUser.surveyDone += 1;
+        syncDataToFirebase();
+        alert(`Chúc mừng! Bạn nhận được +${xuBonus.toLocaleString()} Xu Chính!`);
+      } else {
+        alert("Bạn chọn đáp án không nhận được Xu nào!");
+      }
+      startCooldown25s();
+    }
+
+    function handleVuotLink() {
+      alert("Đang chuyển hướng sang trang vượt link...\nHoàn thành sẽ nhận +20.000 Xu Chính!");
+      window.open("https://link4m.org/kksJuc", "_blank");
+      currentUser.xu += 20000;
+      currentUser.surveyDone += 1;
+      syncDataToFirebase();
+      alert("Cảm ơn đã ủng hộ! Bạn nhận ngay +20.000 Xu Chính!");
+    }
+
+    // --- 6. LOGIC ĐỔI QUÀ VÀ GỬI ĐƠN LÊN FIREBASE SERVER ---
+    function changeGame() {
+      let selected = document.getElementById('gameSelect').value;
+      document.getElementById('ffSection').style.display = (selected === 'ff') ? 'block' : 'none';
+      document.getElementById('lqSection').style.display = (selected === 'lq') ? 'block' : 'none';
+      document.getElementById('robloxSection').style.display = (selected === 'roblox') ? 'block' : 'none';
+    }
+
+    function redeemReward(itemName, costXu, gameType) {
+      let gameId = "";
+      if (gameType === 'ff') gameId = document.getElementById('ffIdInput').value.trim();
+      if (gameType === 'roblox') gameId = document.getElementById('robloxIdInput').value.trim();
+
+      if (!gameId) return alert("VUI LÒNG NHẬP ID GAME TRƯỚC KHU ĐỔI QUÀ!");
+      if (currentUser.xu < costXu) return alert(`Cần ${costXu.toLocaleString()} Xu Chính để đổi gói ${itemName}!`);
+
+      currentUser.xu -= costXu;
+      syncDataToFirebase();
+
+      // Gửi đơn đổi quà về Máy Chủ Firebase cho Admin duyệt
+      const newRedeemRef = db.ref('redeem_requests').push();
+      newRedeemRef.set({
+        request_id: newRedeemRef.key,
+        user_id: currentUser.id,
+        user_name: currentUser.name,
+        game_id: gameId,
+        game_type: gameType,
+        item_name: itemName,
+        cost_xu: costXu,
+        status: "Chờ duyệt",
+        time: new Date().toLocaleString("vi-VN")
+      }).then(() => {
+        alert(`ĐỔI THÀNH CÔNG GÓI ${itemName} CHO ID: ${gameId}!\nYêu cầu đã gửi lên Máy Chủ, Admin sẽ duyệt cực nhanh.`);
+      });
+    }
+
+    // --- 7. CODE APP CHÍNH ---
+    let adminCodes = {
+      "TANTHU99": 10999,
+      "@KHANGG.KAPHI9": 20000
+    };
+
+    function nhapCode() {
+      let code = document.getElementById('codeInput').value.trim().toUpperCase();
+      if (!code) return alert("VUI LÒNG NHẬP MÃ CODE!");
+      if (currentUser.usedCodes.includes(code)) return alert("Mã code này bạn đã nhập rồi!");
+
+      if (adminCodes[code]) {
+        let xuBonus = adminCodes[code];
+        currentUser.xu += xuBonus;
+        currentUser.usedCodes.push(code);
+        syncDataToFirebase();
+        alert(`Chúc mừng! Nhận +${xuBonus.toLocaleString()} Xu Chính từ code '${code}'!`);
+        document.getElementById('codeInput').value = '';
+      } else {
+        alert("Mã code không tồn tại!");
+      }
+    }
+
+    // --- 8. PHÁT NHẠC YOUTUBE ---
+    const playlist = [
+      { id: 'ND04Rg7fl6M', title: '1. Tao Có Ông Anh Văn Hiệp' },
+      { id: '4Oj9M-Srxlk', title: '2. Nhạc Chill' },
+      { id: 'qJhts_cgrqY', title: '3. Nhạc Dành Cho Lớp' }
+    ];
+
+    let currentTrackIndex = 0;
+
+    function changeTrack() {
+      currentTrackIndex = parseInt(document.getElementById('musicSelect').value);
+      loadYoutubeVideo();
+    }
+
+    function nextTrack() {
+      currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+      document.getElementById('musicSelect').value = currentTrackIndex;
+      loadYoutubeVideo();
+    }
+
+    function loadYoutubeVideo() {
+      let song = playlist[currentTrackIndex];
+      document.getElementById('songTitleDisplay').innerText = `🎵 ${song.title}`;
+      document.getElementById('youtubeIframe').src = `https://www.youtube.com/embed/${song.id}?autoplay=1&enablejsapi=1`;
+    }
+
+    // --- 9. XÓA TÀI KHOẢN KHỎI MÁY CHỦ ---
+    function deleteAccountPermanent() {
+      let confirmDelete = confirm("CẢNH BÁO: Bạn có chắc chắn muốn XÓA VĨNH VIỄN tài khoản?");
+      if (confirmDelete) {
+        let doubleCheck = prompt("Nhập từ 'XOA' vào bên dưới để xác nhận:");
+        if (doubleCheck && doubleCheck.toUpperCase() === 'XOA') {
+          db.ref('users/' + currentUser.id).remove();
+          localStorage.clear();
+          alert("Tài khoản của bạn đã bị xóa khỏi Máy Chủ!");
+          location.reload();
+        }
+      }
+    }
+
+    renderSurvey();
+  </script>
+</body>
+</html>
