@@ -1,52 +1,665 @@
-WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........WEB ĐÃ SẬP
-..........
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TKILL.COM - Tap Xu, Đổi NKCARD & Nhập Code</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- FIREBASE SDK CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #0b0e14; color: #fff; height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        .app-container {
+            width: 100vw; height: 100vh; max-width: 100%; max-height: 100%;
+            background: #121621; display: flex; flex-direction: column; position: relative;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.2); border: 1px solid #1f293d; overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .app-container { max-width: 480px; max-height: 920px; }
+        }
+
+        /* HEADER */
+        .top-bar {
+            height: 50px; background: #1a202c; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 15px; border-bottom: 1px solid #2d3748; z-index: 100; flex-shrink: 0;
+        }
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .menu-btn { font-size: 22px; color: #00f0ff; cursor: pointer; }
+        .brand { font-family: 'Orbitron'; font-weight: 900; color: #00f0ff; font-size: 15px; letter-spacing: 1px; }
+        .header-right { display: flex; align-items: center; gap: 8px; }
+        .coin-badge { font-size: 11px; background: rgba(252,238,10,0.15); color: #fcee0a; padding: 4px 8px; border-radius: 6px; border: 1px solid #fcee0a; font-family: monospace; font-weight: bold; }
+
+        /* SIDEBAR 3 GẠCH */
+        #side-menu {
+            position: absolute; top: 0; left: -100%; width: 75%; max-width: 300px; height: 100%; background: #161b22; z-index: 400;
+            border-right: 2px solid #00f0ff; transition: left 0.3s ease; padding: 20px; display: flex; flex-direction: column; gap: 10px;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.8); overflow-y: auto;
+        }
+        #side-menu.open { left: 0; }
+        .menu-title { font-family: 'Orbitron'; color: #00f0ff; font-size: 14px; border-bottom: 1px solid #2d3748; padding-bottom: 10px; }
+        .menu-item { background: #21262d; padding: 11px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #fff; border: 1px solid #30363d; }
+        .menu-item:active { background: #00f0ff; color: #000; }
+
+        /* AUTH SCREEN */
+        #authScreen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #121621; z-index: 500;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; gap: 15px; overflow-y: auto;
+        }
+        .auth-input { width: 100%; max-width: 400px; background: #0b0e14; border: 1px solid #30363d; color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; }
+        .auth-btn { width: 100%; max-width: 400px; background: linear-gradient(135deg, #00f0ff, #0077ff); color: #000; border: none; padding: 12px; border-radius: 8px; font-family: 'Orbitron'; font-weight: bold; font-size: 13px; cursor: pointer; }
+
+        /* VIEWS */
+        .view-content { flex: 1; overflow-y: auto; padding: 15px; display: none; flex-direction: column; align-items: center; }
+        .view-content.active { display: flex; }
+
+        /* TAP HOME */
+        .tap-circle {
+            width: 170px; height: 170px; border-radius: 50%; background: radial-gradient(circle, #00f0ff 0%, #0077ff 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: 0 0 30px rgba(0,240,255,0.4); border: 4px solid #fff; margin: 15px 0; transition: transform 0.05s; flex-shrink: 0;
+        }
+        .tap-circle:active { transform: scale(0.92); }
+        .tap-text { font-family: 'Orbitron'; font-size: 30px; font-weight: 900; color: #000; }
+        .tap-sub { font-size: 10px; font-weight: bold; color: #000; margin-top: 2px; }
+
+        .btn-action { width: 100%; background: linear-gradient(135deg, #ff0055, #ff5500); color: #fff; border: none; padding: 12px; border-radius: 8px; font-family: 'Orbitron'; font-weight: bold; font-size: 12px; cursor: pointer; text-align: center; margin-top: 10px; }
+        .warning-box { background: rgba(255,0,0,0.15); border: 1px solid #ff0000; color: #ff5555; padding: 10px; border-radius: 8px; font-size: 11px; font-weight: bold; text-align: center; line-height: 1.4; margin-bottom: 10px; width: 100%; }
+
+        .card { width: 100%; max-width: 450px; background: #1a202c; border: 1px solid #2d3748; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+        .card select, .card input { width: 100%; background: #0b0e14; color: #fff; border: 1px solid #4a5568; padding: 8px; border-radius: 6px; font-size: 12px; margin-top: 5px; }
+
+        /* BỊ BAN SCREEN */
+        #bannedScreen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(18,22,33,0.98); z-index: 900;
+            display: none; flex-direction: column; align-items: center; justify-content: center; padding: 25px; text-align: center;
+        }
+
+        /* NOTIFICATION MODAL */
+        #notiModal {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 700;
+            display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .noti-box { width: 100%; max-width: 400px; background: #1a202c; border: 2px solid #00f0ff; border-radius: 12px; padding: 20px; text-align: center; }
+
+        /* AUTH ERROR MODAL */
+        #authErrorModal {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 850;
+            display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .error-box { width: 100%; max-width: 380px; background: #1a202c; border: 2px solid #ff0055; border-radius: 12px; padding: 20px; text-align: center; }
+
+        .toast { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: #00f0ff; padding: 8px 16px; border-radius: 20px; font-size: 11px; border: 1px solid #00f0ff; display: none; z-index: 800; text-align: center; white-space: nowrap; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- BỊ KHÓA SCREEN -->
+        <div id="bannedScreen">
+            <h1 style="font-family:'Orbitron'; color:#ff0055; font-size:22px; margin-bottom:10px;">🚨 CẢNH BÁO GIAN LẬN</h1>
+            <p style="font-size:12px; color:#a0aec0; line-height:1.6; margin-bottom:20px;" id="banReasonText">Tài khoản của bạn đã bị khóa tạm thời do thao tác quá giới hạn.</p>
+            <button class="btn-action" onclick="unbanMyAccount()" style="background:#00ff66; color:#000; margin-bottom:10px;">MỞ KHÓA TÀI KHOẢN NGAY</button>
+            <button class="btn-action" onclick="logout()" style="background:#ff0055;">ĐĂNG XUẤT</button>
+        </div>
+
+        <!-- AUTH SCREEN -->
+        <div id="authScreen">
+            <h1 style="font-family:'Orbitron'; color:#00f0ff; font-size:20px;">TKILL.COM</h1>
+            <p style="font-size:11px; color:#a0aec0; text-align:center;">Hệ thống Cày Xu & Đổi NKCARD</p>
+            <input type="text" id="authUsername" class="auth-input" placeholder="Tên tài khoản (Không dấu cách, không ký tự đặc biệt)">
+            <input type="password" id="authPassword" class="auth-input" placeholder="Mật khẩu">
+            <button class="auth-btn" onclick="handleAuth('register')">ĐĂNG KÝ TÀI KHOẢN</button>
+            <button class="auth-btn" style="background: linear-gradient(135deg, #00ff66, #008833); color:#000;" onclick="handleAuth('login')">ĐĂNG NHẬP</button>
+        </div>
+
+        <!-- TOP BAR -->
+        <div class="top-bar">
+            <div class="header-left">
+                <div class="menu-btn" onclick="toggleSideMenu()">☰</div>
+                <div class="brand">TKILL.COM</div>
+            </div>
+            <div class="header-right">
+                <div style="font-size:10px; background:rgba(0,240,255,0.15); color:#00f0ff; padding:3px 6px; border-radius:6px; cursor:pointer;" onclick="showNotiModal()">📢 Thông Báo</div>
+                <div class="coin-badge" id="headerCoins">🪙 0 Xu</div>
+            </div>
+        </div>
+
+        <!-- SIDEBAR 3 GẠCH -->
+        <div id="side-menu">
+            <div class="menu-title">MENU TKILL.COM</div>
+            <div class="menu-item" onclick="switchView('home')">🏠 Trang Chủ Tap Xu</div>
+            <div class="menu-item" onclick="switchView('upgrade')">⚡ Nâng Cấp Lượt Tap</div>
+            <div class="menu-item" onclick="switchView('giftcode')">🎁 Nhập Giftcode</div>
+            <div class="menu-item" onclick="switchView('shortlink')">🔗 Vượt Link 4M (+100 Xu)</div>
+            <div class="menu-item" onclick="switchView('redeem')">🎁 Đổi Thẻ NKCARD</div>
+            <div class="menu-item" onclick="switchView('history')">📜 Lịch Sử Đổi Thẻ</div>
+            <div class="menu-item" onclick="switchView('profile')">👤 Thông Tin Cá Nhân & Đổi MK</div>
+            <div class="menu-item" onclick="logout()" style="margin-top:auto; background:#ff0055; color:#fff;">🚪 Đăng Xuất</div>
+        </div>
+
+        <!-- VIEW 1: TRANG CHỦ TAP -->
+        <div class="view-content active" id="view-home">
+            <h3 style="font-family:'Orbitron'; color:#00f0ff; margin-top:5px;">CÀY XU TAP NGAY</h3>
+            <p style="font-size:11px; color:#a0aec0; margin-top:3px;">Tài khoản: <b style="color:#00f0ff;" id="homeUsernameDisplay">---</b></p>
+            <p style="font-size:11px; color:#a0aec0; margin-top:2px;">Số Xu: <span id="homeCoins" style="color:#fcee0a; font-weight:bold;">0</span></p>
+            
+            <div class="tap-circle" ontouchstart="doTap(event)" onmousedown="doTap(event)">
+                <div class="tap-text">TAP</div>
+                <div class="tap-sub" id="tapRewardLabel">1TAP / 2XU</div>
+            </div>
+            <p style="font-size:10px; color:#6b7280; text-align:center;">💡 Mẹo: Chơi 2 ngón hoặc đè phím Enter tẹt ga không sợ ban!</p>
+        </div>
+
+        <!-- VIEW 2: NÂNG CẤP LƯỢT TAP -->
+        <div class="view-content" id="view-upgrade">
+            <h3 style="font-family:'Orbitron'; color:#00f0ff; margin-top:5px;">NÂNG CẤP LƯỢT TAP</h3>
+            <div class="card" style="margin-top:10px; text-align:center;">
+                <p style="font-size:12px; color:#a0aec0;">Cấp hiện tại: <span id="upgradeLevel" style="color:#00ff66;">Cấp 1</span></p>
+                <p style="font-size:14px; font-weight:bold; color:#fcee0a; margin:10px 0;" id="currentTapRate">Mức thưởng: 2 Xu / Tap</p>
+                <p style="font-size:11px; color:#aaa;" id="upgradeCostText">Phí nâng cấp: 3 Xu (+30% xu thưởng)</p>
+                <button class="btn-action" onclick="upgradeTapLevel()">NÂNG CẤP NGAY</button>
+            </div>
+        </div>
+
+        <!-- VIEW 3: NHẬP GIFTCODE -->
+        <div class="view-content" id="view-giftcode">
+            <h3 style="font-family:'Orbitron'; color:#00f0ff; margin-top:5px;">NHẬP GIFTCODE</h3>
+            <div class="card" style="margin-top:10px; text-align:center;">
+                <p style="font-size:11px; color:#a0aec0; margin-bottom:10px;">Nhập mã code nhận thưởng xu miễn phí từ Admin:</p>
+                <input type="text" id="giftcodeInput" placeholder="Nhập mã code..." style="text-align:center; text-transform:uppercase; font-weight:bold;">
+                <button class="btn-action" onclick="submitGiftcode()">NHẬP CODE</button>
+                <p id="giftcodeResult" style="font-size:12px; font-weight:bold; margin-top:12px; min-height:18px;"></p>
+            </div>
+        </div>
+
+        <!-- VIEW 4: VƯỢT LINK 4M -->
+        <div class="view-content" id="view-shortlink">
+            <h3 style="font-family:'Orbitron'; color:#00f0ff; margin-top:5px;">VƯỢT LINK 4M (+100 XU)</h3>
+            <div class="warning-box">
+                KHÔNG TẢI APP, KHÔNG TIN WEB CÁ CƯỢC, CỜ BẠC MẤT HẾT TÀI SẢN, LỪA ĐẢO!!!!!
+            </div>
+            <div class="card" style="text-align:center;">
+                <p style="font-size:11px; color:#a0aec0; margin-bottom:10px;">Số lần vượt link hôm nay: <span id="shortlinkCount" style="color:#00ff66;">0</span> / 3</p>
+                <button class="btn-action" id="vuotLinkBtn" onclick="startShortlinkProcess()">[ VUOTLINK4M ]</button>
+            </div>
+        </div>
+
+        <!-- VIEW 5: ĐỔI THƯỞNG NKCARD -->
+        <div class="view-content" id="view-redeem">
+            <h3 style="font-family:'Orbitron'; color:#00f0ff; margin-top:5px;">ĐỔI THẺ NKCARD</h3>
+            <p style="font-size:11px; color:#fcee0a; margin-top:3px;">Xu Khả Dụng: <span id="redeemCoins">0</span> Xu (Tỷ giá: 15 Xu = 1đ)</p>
+            
+            <div class="card" style="margin-top:10px;">
+                <label style="font-size:11px; color:#a0aec0;">Chọn loại thẻ:</label>
+                <select id="telcoSelect">
+                    <option value="NKCARD ĐỘC QUYỀN (NAPTHE.VN)">NKCARD ĐỘC QUYỀN (NAPTHE.VN)</option>
+                </select>
+
+                <label style="font-size:11px; color:#a0aec0; display:block; margin-top:10px;">Chọn mệnh giá:</label>
+                <select id="amountSelect" onchange="calcRequiredXu()">
+                    <option value="10000">10K (Cần 150.000 Xu)</option>
+                    <option value="20000">20K (Cần 300.000 Xu)</option>
+                    <option value="50000">50K (Cần 750.000 Xu)</option>
+                </select>
+
+                <p style="font-size:11px; color:#ff5555; margin-top:10px;" id="requiredXuText">Cần trả: 150.000 Xu</p>
+                <button class="btn-action" onclick="submitRedeem()">XÁC NHẬN ĐỔI NKCARD</button>
+            </div>
+        </div>
+
+        <!-- VIEW 6: LỊCH SỬ ĐỔI THẺ -->
+        <div class="view-content" id="view-history">
+            <h3 style="font-family:'Orbitron'; color:#00f0ff; margin-top:5px;">LỊCH SỬ ĐỔI THẺ</h3>
+            <div id="historyList" style="width:100%; max-width:450px; margin-top:10px; display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+
+        <!-- VIEW 7: THÔNG TIN CÁ NHÂN & ĐỔI MẬT KHẨU -->
+        <div class="view-content" id="view-profile">
+            <h3 style="font-family:'Orbitron'; color:#00f0ff; margin-top:5px;">THÔNG TIN CÁ NHÂN</h3>
+            <div class="card" style="margin-top:10px;">
+                <p style="font-size:12px; color:#a0aec0; margin-bottom:8px;">Tên tài khoản: <b style="color:#00f0ff;" id="profileName">---</b></p>
+                <p style="font-size:12px; color:#a0aec0; margin-bottom:8px;">ID Người dùng: <b style="color:#fcee0a;" id="profileId">---</b></p>
+            </div>
+
+            <h3 style="font-family:'Orbitron'; color:#00f0ff; margin-top:15px;">ĐỔI MẬT KHẨU</h3>
+            <div class="card" style="margin-top:10px;">
+                <label style="font-size:11px; color:#a0aec0;">Nhập mật khẩu cũ:</label>
+                <input type="password" id="oldPassword" placeholder="Mật khẩu cũ">
+
+                <label style="font-size:11px; color:#a0aec0; display:block; margin-top:10px;">Nhập mật khẩu mới:</label>
+                <input type="password" id="newPassword" placeholder="Mật khẩu mới">
+
+                <label style="font-size:11px; color:#a0aec0; display:block; margin-top:10px;">Xác nhận lại mật khẩu mới:</label>
+                <input type="password" id="confirmPassword" placeholder="Xác nhận mật khẩu mới">
+
+                <button class="btn-action" onclick="changePassword()">CẬP NHẬT MẬT KHẨU</button>
+            </div>
+        </div>
+
+        <!-- AUTH ERROR MODAL -->
+        <div id="authErrorModal" onclick="hideAuthError()">
+            <div class="error-box" onclick="event.stopPropagation()">
+                <h3 style="font-family:'Orbitron'; color:#ff0055; margin-bottom:10px; font-size:15px;">❌ LỖI ĐĂNG NHẬP / ĐĂNG KÝ</h3>
+                <p style="font-size:12px; color:#fff; line-height:1.5; margin-bottom:15px;" id="authErrorText">Nội dung lỗi ở đây...</p>
+                <button class="btn-action" style="margin-top:0; background:#ff0055;" onclick="hideAuthError()">ĐÓNG</button>
+            </div>
+        </div>
+
+        <!-- NOTIFICATION MODAL -->
+        <div id="notiModal" onclick="hideNotiModal()">
+            <div class="noti-box" onclick="event.stopPropagation()">
+                <h3 style="font-family:'Orbitron'; color:#00f0ff; margin-bottom:10px; font-size:15px;">📢 THÔNG BÁO HỆ THỐNG</h3>
+                <p style="font-size:12px; color:#fff; line-height:1.5; margin-bottom:15px;" id="notiContent">Đang tải thông báo từ server...</p>
+                <button class="btn-action" style="margin-top:0;" onclick="hideNotiModal()">ĐÓNG</button>
+            </div>
+        </div>
+
+        <!-- TOAST -->
+        <div class="toast" id="toastMsg">Thông báo</div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            databaseURL: "https://themlonquay-default-rtdb.asia-southeast1.firebasedatabase.app"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Đồng bộ thông tin Admin & Nhánh Codes mẫu lên Firebase
+        db.ref('system_admin/account').set({
+            username: "nkadmindev",
+            password: "khangtytyoppopdevvipadpro",
+            tag: "@N.KHANG W KHANGG!⚔️🥶🔥☠️😭💤💤 ID TIKTOK:khangbakhiaura214",
+            updatedAt: new Date().toLocaleString('vi-VN')
+        }).catch(e => {});
+
+        // Khởi tạo sẵn nhánh codes mẫu trên Firebase nếu chưa có
+        db.ref('codes').once('value').then(snapshot => {
+            if (!snapshot.val()) {
+                db.ref('codes').set({
+                    "TKILL2026": 500,
+                    "VIP100": 100
+                });
+            }
+        });
+
+        let currentUser = localStorage.getItem('tkill_user') || null;
+        let currentUserId = localStorage.getItem('tkill_uid') || null;
+        let userData = { coins: 0, tapReward: 2, upgradeLevel: 1, upgradeCost: 3, shortlinkToday: 0, lastDate: "", isBanned: false };
+
+        let todayStr = new Date().toDateString();
+        const badWords = ['cặc', 'lồn', 'mẹ', 'mày', 'bố', 'cu', 'dái', 'chim', 'má', 'cha', 'ba'];
+
+        if (currentUser) {
+            document.getElementById('authScreen').style.display = 'none';
+            initRealtimeSync();
+        }
+
+        function showToast(text) {
+            const toast = document.getElementById('toastMsg');
+            toast.innerText = text; toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
+        }
+
+        function showAuthError(msg) {
+            document.getElementById('authErrorText').innerText = msg;
+            document.getElementById('authErrorModal').style.display = 'flex';
+        }
+
+        function hideAuthError() {
+            document.getElementById('authErrorModal').style.display = 'none';
+        }
+
+        function toggleSideMenu() { document.getElementById('side-menu').classList.toggle('open'); }
+
+        function switchView(viewName) {
+            toggleSideMenu();
+            document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+            document.getElementById(`view-${viewName}`).classList.add('active');
+            if (viewName === 'redeem') calcRequiredXu();
+            if (viewName === 'history') fetchHistoryFromFirebase();
+            if (viewName === 'profile') loadProfileData();
+            if (viewName === 'home') updateUI();
+        }
+
+        function showNotiModal() {
+            db.ref('system_announcement').once('value').then(snapshot => {
+                let data = snapshot.val();
+                if(data) {
+                    document.getElementById('notiContent').innerText = data.message;
+                } else {
+                    document.getElementById('notiContent').innerText = "Chào mừng bạn đến với TKILL.COM!";
+                }
+                document.getElementById('notiModal').style.display = 'flex';
+            });
+        }
+        function hideNotiModal() { document.getElementById('notiModal').style.display = 'none'; }
+
+        async function handleAuth(type) {
+            let u = document.getElementById('authUsername').value.trim().toLowerCase();
+            let p = document.getElementById('authPassword').value.trim();
+
+            if (!u || !p) {
+                showAuthError("⚠️ Vui lòng nhập đầy đủ tên tài khoản và mật khẩu!");
+                return;
+            }
+
+            let specialCharPattern = /[^a-zA-Z0-9]/;
+            if (specialCharPattern.test(u) || u.includes(" ")) {
+                showAuthError("❌ Tên tài khoản KHÔNG ĐƯỢC chứa dấu cách, chữ cái có dấu hoặc ký tự đặc biệt!");
+                return;
+            }
+
+            for (let word of badWords) {
+                if (u.includes(word)) {
+                    showAuthError(`❌ Tên tài khoản chứa từ ngữ bị cấm (${word})! Vui lòng chọn tên khác.`);
+                    return;
+                }
+            }
+
+            let safeUsername = u.replace(/[.#$\/\[\]]/g, "_");
+
+            let checkBlacklist = await db.ref('blacklisted_names/' + safeUsername).once('value');
+            if (checkBlacklist.val() && type === 'register') {
+                showAuthError("❌ Tên tài khoản này đã từng tồn tại trên hệ thống và đã bị cấm sử dụng vĩnh viễn!");
+                return;
+            }
+
+            let userRef = db.ref('users/' + safeUsername);
+            let snapshot = await userRef.once('value');
+
+            if (type === 'register') {
+                if (snapshot.val()) {
+                    showAuthError("❌ Tên tài khoản này đã có người sử dụng! Hãy chọn tên khác.");
+                    return;
+                }
+
+                let randomNum = Math.floor(100000 + Math.random() * 900000);
+                let generatedId = "nk_" + randomNum;
+
+                let initialData = { coins: 0, tapReward: 2, upgradeLevel: 1, upgradeCost: 3, shortlinkToday: 0, lastDate: todayStr, isBanned: false };
+                
+                await userRef.set({
+                    password: p,
+                    uid: generatedId,
+                    data: initialData,
+                    tag: "@N.KHANG W KHANGG!⚔️🥶🔥☠️😭💤💤"
+                });
+
+                db.ref('blacklisted_names/' + safeUsername).set(true);
+
+                currentUser = u;
+                currentUserId = generatedId;
+                localStorage.setItem('tkill_user', u);
+                localStorage.setItem('tkill_uid', generatedId);
+
+                document.getElementById('authScreen').style.display = 'none';
+                showToast("🎉 Đăng ký thành công!");
+                initRealtimeSync();
+
+            } else if (type === 'login') {
+                let data = snapshot.val();
+                if (!data || data.password !== p) {
+                    showAuthError("❌ Sai tên tài khoản hoặc mật khẩu! Nếu chưa có tài khoản, vui lòng bấm 'ĐĂNG KÝ TÀI KHOẢN'.");
+                    return;
+                }
+
+                currentUser = u;
+                currentUserId = data.uid || "nk_000000";
+                localStorage.setItem('tkill_user', u);
+                localStorage.setItem('tkill_uid', currentUserId);
+
+                document.getElementById('authScreen').style.display = 'none';
+                showToast(`✅ Đăng nhập thành công: ${u}`);
+                initRealtimeSync();
+            }
+        }
+
+        function initRealtimeSync() {
+            if (!currentUser) return;
+            let safeUsername = currentUser.replace(/[.#$\/\[\]]/g, "_");
+            
+            db.ref('users/' + safeUsername + '/data').on('value', (snapshot) => {
+                let serverData = snapshot.val();
+                if (serverData) {
+                    userData = serverData;
+                } else {
+                    userData = { coins: 0, tapReward: 2, upgradeLevel: 1, upgradeCost: 3, shortlinkToday: 0, lastDate: todayStr, isBanned: false };
+                    syncToFirebase();
+                }
+
+                if (userData.isBanned) {
+                    document.getElementById('bannedScreen').style.display = 'flex';
+                    return;
+                } else {
+                    document.getElementById('bannedScreen').style.display = 'none';
+                }
+                
+                if (userData.lastDate !== todayStr) {
+                    userData.shortlinkToday = 0;
+                    userData.lastDate = todayStr;
+                    syncToFirebase();
+                }
+                updateUI();
+            });
+        }
+
+        function saveUserDataToFirebase() {
+            if (!currentUser || userData.isBanned) return;
+            let safeUsername = currentUser.replace(/[.#$\/\[\]]/g, "_");
+            db.ref('users/' + safeUsername + '/data').set(userData);
+        }
+
+        function syncToFirebase() {
+            saveUserDataToFirebase();
+        }
+
+        function updateUI() {
+            document.getElementById('headerCoins').innerText = `🪙 ${userData.coins} Xu`;
+            document.getElementById('homeCoins').innerText = userData.coins;
+            document.getElementById('redeemCoins').innerText = userData.coins;
+            document.getElementById('tapRewardLabel').innerText = `1TAP / ${userData.tapReward}XU`;
+            document.getElementById('upgradeLevel').innerText = `Cấp ${userData.upgradeLevel}`;
+            document.getElementById('currentTapRate').innerText = `Mức thưởng: ${userData.tapReward} Xu / Tap`;
+            document.getElementById('upgradeCostText').innerText = `Phí nâng cấp: ${userData.upgradeCost} Xu (+30% xu thưởng)`;
+            document.getElementById('shortlinkCount').innerText = userData.shortlinkToday;
+            document.getElementById('homeUsernameDisplay').innerText = currentUser || "---";
+            calcRequiredXu();
+        }
+
+        function loadProfileData() {
+            document.getElementById('profileName').innerText = currentUser || "---";
+            document.getElementById('profileId').innerText = currentUserId || "---";
+        }
+
+        async function changePassword() {
+            let oldP = document.getElementById('oldPassword').value.trim();
+            let newP = document.getElementById('newPassword').value.trim();
+            let confP = document.getElementById('confirmPassword').value.trim();
+
+            if (!oldP || !newP || !confP) { showToast("⚠️ Vui lòng nhập đầy đủ thông tin mật khẩu!"); return; }
+            if (newP !== confP) { showToast("❌ Mật khẩu mới không trùng khớp!"); return; }
+
+            let safeUsername = currentUser.replace(/[.#$\/\[\]]/g, "_");
+            let userRef = db.ref('users/' + safeUsername);
+            let snapshot = await userRef.once('value');
+            let data = snapshot.val();
+
+            if (data.password !== oldP) {
+                showToast("❌ Mật khẩu cũ không chính xác!");
+                return;
+            }
+
+            await userRef.update({ password: newP });
+            showToast("✅ Đổi mật khẩu thành công!");
+            document.getElementById('oldPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        }
+
+        // --- HỆ THỐNG NHẬP GIFTCODE ---
+        async function submitGiftcode() {
+            let codeInput = document.getElementById('giftcodeInput').value.trim();
+            let resultEl = document.getElementById('giftcodeResult');
+
+            if (!codeInput) {
+                resultEl.style.color = '#ff5555';
+                resultEl.innerText = 'nhập code sai hoặc hết hạn';
+                return;
+            }
+
+            let safeUsername = currentUser.replace(/[.#$\/\[\]]/g, "_");
+            let codeKey = codeInput.replace(/[.#$\/\[\]]/g, "_");
+
+            let usedCheckRef = db.ref(`users/${safeUsername}/used_codes/${codeKey}`);
+            let usedSnapshot = await usedCheckRef.once('value');
+
+            if (usedSnapshot.val()) {
+                resultEl.style.color = '#ff5555';
+                resultEl.innerText = 'nhập code sai hoặc hết hạn';
+                return;
+            }
+
+            let codeRef = db.ref(`codes/${codeKey}`);
+            let codeSnapshot = await codeRef.once('value');
+            let rewardCoins = codeSnapshot.val();
+
+            if (rewardCoins === null || rewardCoins === undefined || isNaN(rewardCoins)) {
+                resultEl.style.color = '#ff5555';
+                resultEl.innerText = 'nhập code sai hoặc hết hạn';
+                return;
+            }
+
+            userData.coins += parseInt(rewardCoins);
+            saveUserDataToFirebase();
+            await usedCheckRef.set(true);
+
+            resultEl.style.color = '#00ff66';
+            resultEl.innerText = '[NHẬP CODE THÀNH CÔNG]';
+            document.getElementById('giftcodeInput').value = '';
+        }
+
+        function logout() {
+            localStorage.removeItem('tkill_user');
+            localStorage.removeItem('tkill_uid');
+            location.reload();
+        }
+
+        function unbanMyAccount() {
+            userData.isBanned = false;
+            saveUserDataToFirebase();
+            document.getElementById('bannedScreen').style.display = 'none';
+            showToast("🔓 Đã mở khóa tài khoản thành công!");
+        }
+
+        function doTap(e) {
+            if (e && e.type === 'touchstart') {
+                e.preventDefault();
+            }
+            if (userData.isBanned) return;
+
+            userData.coins += userData.tapReward;
+            saveUserDataToFirebase();
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && currentUser && document.getElementById('view-home').classList.contains('active')) {
+                doTap();
+            }
+        });
+
+        function upgradeTapLevel() {
+            if (userData.coins < userData.upgradeCost) { showToast("⚠️ Không đủ Xu nâng cấp!"); return; }
+            userData.coins -= userData.upgradeCost;
+            userData.upgradeLevel += 1;
+            userData.tapReward = Math.round(userData.tapReward * 1.3);
+            userData.upgradeCost = Math.round(userData.upgradeCost * 1.5);
+            saveUserDataToFirebase();
+            showToast("⚡ Nâng cấp thành công!");
+        }
+
+        function startShortlinkProcess() {
+            if (userData.shortlinkToday >= 3) { showToast("⚠️ Đã đạt giới hạn 3 lần/ngày!"); return; }
+            let a = Math.floor(Math.random() * 8) + 1;
+            let b = Math.floor(Math.random() * 8) + 1;
+            let ans = prompt(`🤖 XÁC MINH ROBOT LINK4M:\nTính: ${a} + ${b} = ?`);
+            if (parseInt(ans) !== a + b) { showToast("❌ Sai phép tính!"); return; }
+
+            showToast("⏳ Đang kiểm tra vượt link (3s)...");
+            document.getElementById('vuotLinkBtn').style.pointerEvents = 'none';
+            setTimeout(() => {
+                userData.shortlinkToday += 1;
+                userData.coins += 100;
+                saveUserDataToFirebase();
+                document.getElementById('vuotLinkBtn').style.pointerEvents = 'auto';
+                showToast("🔥 Nhận +100 Xu thành công!");
+            }, 3000);
+        }
+
+        function calcRequiredXu() {
+            let amount = parseInt(document.getElementById('amountSelect').value);
+            let requiredXu = amount * 15;
+            document.getElementById('requiredXuText').innerText = `Cần trả: ${requiredXu.toLocaleString()} Xu (Tỷ giá: 15 Xu = 1đ)`;
+        }
+
+        function submitRedeem() {
+            let telco = document.getElementById('telcoSelect').value;
+            let amount = parseInt(document.getElementById('amountSelect').value);
+            let requiredXu = amount * 15;
+
+            if (userData.coins < requiredXu) { showToast("⚠️ Không đủ Xu đổi thẻ NKCARD!"); return; }
+
+            userData.coins -= requiredXu;
+            saveUserDataToFirebase();
+
+            let id = 'redeem_' + Date.now();
+            db.ref('redeem_history/' + id).set({
+                user: currentUser,
+                telco: telco,
+                amount: amount,
+                costXu: requiredXu,
+                cardCode: "(Chờ Admin duyệt mã)",
+                serial: "(Chờ Admin duyệt seri)",
+                status: "CHƯA DUYỆT",
+                time: new Date().toLocaleString('vi-VN')
+            }).then(() => {
+                showToast("🎉 Đã gửi yêu cầu đổi NKCARD!");
+                switchView('history');
+            });
+        }
+
+        function fetchHistoryFromFirebase() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = `<div style="text-align:center; color:#aaa; font-size:12px;">Đang tải lịch sử...</div>`;
+            
+            db.ref('redeem_history').once('value').then(snapshot => {
+                list.innerHTML = '';
+                const data = snapshot.val();
+                if (!data) { list.innerHTML = `<div style="text-align:center; color:#aaa; font-size:12px;">Chưa có lịch sử đổi NKCARD.</div>`; return; }
+
+                Object.keys(data).reverse().forEach(key => {
+                    let item = data[key];
+                    let card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                            <span style="font-family:'Orbitron'; color:#fcee0a; font-size:12px;">${item.amount.toLocaleString()}đ NKCARD</span>
+                            <span style="font-size:11px; font-weight:bold; color:${item.status === 'ĐÃ DUYỆT' ? '#00ff66' : '#ff5555'};">${item.status}</span>
+                        </div>
+                        <p style="font-size:11px; color:#a0aec0;">User: <b style="color:#00f0ff;">${item.user}</b> | Trừ: <b style="color:#fcee0a;">${item.costXu.toLocaleString()} Xu</b></p>
+                        <p style="font-size:11px; color:#a0aec0;">Mã: <b style="color:#00f0ff;">${item.cardCode}</b> | Seri: <b style="color:#00f0ff;">${item.serial}</b></p>
+                        <p style="font-size:9px; color:#6b7280; margin-top:3px;">${item.time}</p>
+                    `;
+                    list.appendChild(card);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
