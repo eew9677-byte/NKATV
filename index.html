@@ -12,17 +12,18 @@
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body { background-color: #0b0e14; color: #fff; height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        body { background-color: #0b0e14; color: #fff; height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s ease; }
 
         .app-container {
             width: 100vw; height: 100vh; max-width: 100%; max-height: 100%;
             background: #121621; display: flex; flex-direction: column; position: relative;
             box-shadow: 0 0 30px rgba(0, 240, 255, 0.2); border: 1px solid #1f293d; overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        @media (min-width: 768px) {
-            .app-container { max-width: 480px; max-height: 920px; }
-        }
+        /* CHẾ ĐỘ GIAO DIỆN PC & MOBILE */
+        body.mode-pc .app-container { max-width: 480px; max-height: 920px; border-radius: 16px; border: 2px solid #00f0ff; }
+        body.mode-mobile .app-container { max-width: 100% !important; max-height: 100% !important; border-radius: 0 !important; border: none !important; }
 
         /* HEADER */
         .top-bar {
@@ -60,12 +61,12 @@
 
         /* TAP HOME */
         .tap-circle {
-            width: 170px; height: 170px; border-radius: 50%; background: radial-gradient(circle, #00f0ff 0%, #0077ff 100%);
+            width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, #00f0ff 0%, #0077ff 100%);
             display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
-            box-shadow: 0 0 30px rgba(0,240,255,0.4); border: 4px solid #fff; margin: 15px 0; transition: transform 0.05s; flex-shrink: 0;
+            box-shadow: 0 0 30px rgba(0,240,255,0.4); border: 4px solid #fff; margin: 10px 0; transition: transform 0.05s; flex-shrink: 0;
         }
         .tap-circle:active { transform: scale(0.92); }
-        .tap-text { font-family: 'Orbitron'; font-size: 30px; font-weight: 900; color: #000; }
+        .tap-text { font-family: 'Orbitron'; font-size: 28px; font-weight: 900; color: #000; }
         .tap-sub { font-size: 10px; font-weight: bold; color: #000; margin-top: 2px; }
 
         .btn-action { width: 100%; background: linear-gradient(135deg, #ff0055, #ff5500); color: #fff; border: none; padding: 12px; border-radius: 8px; font-family: 'Orbitron'; font-weight: bold; font-size: 12px; cursor: pointer; text-align: center; margin-top: 10px; }
@@ -97,14 +98,13 @@
         .toast { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: #00f0ff; padding: 8px 16px; border-radius: 20px; font-size: 11px; border: 1px solid #00f0ff; display: none; z-index: 800; text-align: center; white-space: nowrap; }
     </style>
 </head>
-<body>
+<body class="mode-pc">
 
     <div class="app-container">
         <!-- BỊ KHÓA SCREEN -->
         <div id="bannedScreen">
             <h1 style="font-family:'Orbitron'; color:#ff0055; font-size:22px; margin-bottom:10px;">🚨 CẢNH BÁO GIAN LẬN</h1>
-            <p style="font-size:12px; color:#a0aec0; line-height:1.6; margin-bottom:20px;" id="banReasonText">Tài khoản của bạn đã bị khóa tạm thời do thao tác quá giới hạn.</p>
-            <button class="btn-action" onclick="unbanMyAccount()" style="background:#00ff66; color:#000; margin-bottom:10px;">MỞ KHÓA TÀI KHOẢN NGAY</button>
+            <p style="font-size:12px; color:#a0aec0; line-height:1.6; margin-bottom:20px;" id="banReasonText">Tài khoản của bạn đã bị khóa vĩnh viễn do sử dụng tool hack can thiệp trái phép.</p>
             <button class="btn-action" onclick="logout()" style="background:#ff0055;">ĐĂNG XUẤT</button>
         </div>
 
@@ -138,22 +138,28 @@
             <div class="menu-item" onclick="switchView('giftcode')">🎁 Nhập Giftcode</div>
             <div class="menu-item" onclick="switchView('shortlink')">🔗 Vượt Link 4M (+100 Xu)</div>
             <div class="menu-item" onclick="switchView('redeem')">🎁 Đổi Thẻ NKCARD</div>
-            <div class="menu-item" onclick="switchView('history')">📜 Lịch Sử Đổi Thẻ</div>
+            <div class="menu-item" onclick="switchView('history')">📜 Lịch Sử Đổi Thẻ Của Tôi</div>
             <div class="menu-item" onclick="switchView('profile')">👤 Thông Tin Cá Nhân & Đổi MK</div>
             <div class="menu-item" onclick="logout()" style="margin-top:auto; background:#ff0055; color:#fff;">🚪 Đăng Xuất</div>
         </div>
 
         <!-- VIEW 1: TRANG CHỦ TAP -->
         <div class="view-content active" id="view-home">
-            <h3 style="font-family:'Orbitron'; color:#00f0ff; margin-top:5px;">CÀY XU TAP NGAY</h3>
-            <p style="font-size:11px; color:#a0aec0; margin-top:3px;">Tài khoản: <b style="color:#00f0ff;" id="homeUsernameDisplay">---</b></p>
+            <h3 style="font-family:'Orbitron'; color:#00f0ff; margin-top:2px;">CÀY XU TAP NGAY</h3>
+            <p style="font-size:11px; color:#a0aec0; margin-top:2px;">Tài khoản: <b style="color:#00f0ff;" id="homeUsernameDisplay">---</b></p>
             <p style="font-size:11px; color:#a0aec0; margin-top:2px;">Số Xu: <span id="homeCoins" style="color:#fcee0a; font-weight:bold;">0</span></p>
             
+            <!-- 2 NÚT CHUYỂN ĐỔI GIAO DIỆN -->
+            <div style="display: flex; gap: 8px; margin: 8px 0; width: 100%; max-width: 400px;">
+                <button onclick="setThemeMode('mobile')" style="flex:1; background:#21262d; border:1px solid #00f0ff; color:#00f0ff; padding:6px; font-size:10px; font-weight:bold; border-radius:6px; cursor:pointer;">📱 Giao Diện Mobile</button>
+                <button onclick="setThemeMode('pc')" style="flex:1; background:#21262d; border:1px solid #00f0ff; color:#00f0ff; padding:6px; font-size:10px; font-weight:bold; border-radius:6px; cursor:pointer;">💻 Giao Diện PC</button>
+            </div>
+
             <div class="tap-circle" ontouchstart="doTap(event)" onmousedown="doTap(event)">
                 <div class="tap-text">TAP</div>
                 <div class="tap-sub" id="tapRewardLabel">1TAP / 2XU</div>
             </div>
-            <p style="font-size:10px; color:#6b7280; text-align:center;">💡 Mẹo: Chơi 2 ngón hoặc đè phím Enter tẹt ga không sợ ban!</p>
+            <p style="font-size:10px; color:#6b7280; text-align:center;">💡 Mẹo: Chơi 2 ngón hoặc đè phím Enter tẹt ga!</p>
         </div>
 
         <!-- VIEW 2: NÂNG CẤP LƯỢT TAP -->
@@ -190,10 +196,10 @@
             </div>
         </div>
 
-        <!-- VIEW 5: ĐỔI THƯỞNG NKCARD -->
+        <!-- VIEW 5: ĐỔI THƯỞNG NKCARD (TỶ GIÁ 20 XU = 1 VNĐ, THÊM 100K, 200K) -->
         <div class="view-content" id="view-redeem">
             <h3 style="font-family:'Orbitron'; color:#00f0ff; margin-top:5px;">ĐỔI THẺ NKCARD</h3>
-            <p style="font-size:11px; color:#fcee0a; margin-top:3px;">Xu Khả Dụng: <span id="redeemCoins">0</span> Xu (Tỷ giá: 15 Xu = 1đ)</p>
+            <p style="font-size:11px; color:#fcee0a; margin-top:3px;">Xu Khả Dụng: <span id="redeemCoins">0</span> Xu (Tỷ giá: 20 Xu = 1đ)</p>
             
             <div class="card" style="margin-top:10px;">
                 <label style="font-size:11px; color:#a0aec0;">Chọn loại thẻ:</label>
@@ -203,20 +209,23 @@
 
                 <label style="font-size:11px; color:#a0aec0; display:block; margin-top:10px;">Chọn mệnh giá:</label>
                 <select id="amountSelect" onchange="calcRequiredXu()">
-                    <option value="10000">10K (Cần 150.000 Xu)</option>
-                    <option value="20000">20K (Cần 300.000 Xu)</option>
-                    <option value="50000">50K (Cần 750.000 Xu)</option>
+                    <option value="10000">10K (Cần 200.000 Xu)</option>
+                    <option value="20000">20K (Cần 400.000 Xu)</option>
+                    <option value="50000">50K (Cần 1.000.000 Xu)</option>
+                    <option value="100000">100K (Cần 2.000.000 Xu)</option>
+                    <option value="200000">200K (Cần 4.000.000 Xu)</option>
                 </select>
 
-                <p style="font-size:11px; color:#ff5555; margin-top:10px;" id="requiredXuText">Cần trả: 150.000 Xu</p>
+                <p style="font-size:11px; color:#ff5555; margin-top:10px;" id="requiredXuText">Cần trả: 200.000 Xu</p>
                 <button class="btn-action" onclick="submitRedeem()">XÁC NHẬN ĐỔI NKCARD</button>
             </div>
         </div>
 
-        <!-- VIEW 6: LỊCH SỬ ĐỔI THẺ -->
+        <!-- VIEW 6: LỊCH SỬ ĐỔI THẺ CÁ NHÂN -->
         <div class="view-content" id="view-history">
-            <h3 style="font-family:'Orbitron'; color:#00f0ff; margin-top:5px;">LỊCH SỬ ĐỔI THẺ</h3>
-            <div id="historyList" style="width:100%; max-width:450px; margin-top:10px; display:flex; flex-direction:column; gap:8px;"></div>
+            <h3 style="font-family:'Orbitron'; color:#00f0ff; margin-top:5px;">LỊCH SỬ ĐỔI THẺ CỦA TÔI</h3>
+            <p style="font-size:10px; color:#a0aec0; margin-bottom:10px;">Chỉ hiển thị các yêu cầu đổi thưởng thuộc về tài khoản của bạn.</p>
+            <div id="historyList" style="width:100%; max-width:450px; display:flex; flex-direction:column; gap:8px;"></div>
         </div>
 
         <!-- VIEW 7: THÔNG TIN CÁ NHÂN & ĐỔI MẬT KHẨU -->
@@ -271,7 +280,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Đồng bộ thông tin Admin & Nhánh Codes mẫu lên Firebase
         db.ref('system_admin/account').set({
             username: "nkadmindev",
             password: "khangtytyoppopdevvipadpro",
@@ -279,7 +287,6 @@
             updatedAt: new Date().toLocaleString('vi-VN')
         }).catch(e => {});
 
-        // Khởi tạo sẵn nhánh codes mẫu trên Firebase nếu chưa có
         db.ref('codes').once('value').then(snapshot => {
             if (!snapshot.val()) {
                 db.ref('codes').set({
@@ -300,6 +307,18 @@
             document.getElementById('authScreen').style.display = 'none';
             initRealtimeSync();
         }
+
+        function setThemeMode(mode) {
+            if(mode === 'pc') {
+                document.body.className = 'mode-pc';
+                localStorage.setItem('tkill_theme', 'pc');
+            } else {
+                document.body.className = 'mode-mobile';
+                localStorage.setItem('tkill_theme', 'mobile');
+            }
+        }
+        let savedTheme = localStorage.getItem('tkill_theme') || 'pc';
+        setThemeMode(savedTheme);
 
         function showToast(text) {
             const toast = document.getElementById('toastMsg');
@@ -503,7 +522,6 @@
             document.getElementById('confirmPassword').value = '';
         }
 
-        // --- HỆ THỐNG NHẬP GIFTCODE ---
         async function submitGiftcode() {
             let codeInput = document.getElementById('giftcodeInput').value.trim();
             let resultEl = document.getElementById('giftcodeResult');
@@ -551,18 +569,25 @@
             location.reload();
         }
 
-        function unbanMyAccount() {
-            userData.isBanned = false;
-            saveUserDataToFirebase();
-            document.getElementById('bannedScreen').style.display = 'none';
-            showToast("🔓 Đã mở khóa tài khoản thành công!");
-        }
-
+        // --- CHỐNG CHEAT & ANTI-CHEAT CỰC MẠNH ---
+        let lastTapTimestamp = 0;
         function doTap(e) {
             if (e && e.type === 'touchstart') {
                 e.preventDefault();
             }
             if (userData.isBanned) return;
+
+            let now = Date.now();
+            let diff = now - lastTapTimestamp;
+            // Nếu bấm nhanh hơn 25ms liên tục (Auto clicker / tool can thiệp) -> Ban ngay lập tức
+            if (diff < 25 && lastTapTimestamp !== 0) {
+                userData.isBanned = true;
+                saveUserDataToFirebase();
+                document.getElementById('bannedScreen').style.display = 'flex';
+                document.getElementById('banReasonText').innerText = "🚨 PHÁT HIỆN SỬ DỤNG TOOL/AUTO CLICK GIAN LẬN! Tài khoản đã bị khóa vĩnh viễn.";
+                return;
+            }
+            lastTapTimestamp = now;
 
             userData.coins += userData.tapReward;
             saveUserDataToFirebase();
@@ -604,14 +629,15 @@
 
         function calcRequiredXu() {
             let amount = parseInt(document.getElementById('amountSelect').value);
-            let requiredXu = amount * 15;
-            document.getElementById('requiredXuText').innerText = `Cần trả: ${requiredXu.toLocaleString()} Xu (Tỷ giá: 15 Xu = 1đ)`;
+            // Tỷ giá mới: 20 Xu = 1 VNĐ -> Số xu cần = Mệnh giá * 20
+            let requiredXu = amount * 20;
+            document.getElementById('requiredXuText').innerText = `Cần trả: ${requiredXu.toLocaleString()} Xu (Tỷ giá: 20 Xu = 1đ)`;
         }
 
         function submitRedeem() {
             let telco = document.getElementById('telcoSelect').value;
             let amount = parseInt(document.getElementById('amountSelect').value);
-            let requiredXu = amount * 15;
+            let requiredXu = amount * 20;
 
             if (userData.coins < requiredXu) { showToast("⚠️ Không đủ Xu đổi thẻ NKCARD!"); return; }
 
@@ -620,7 +646,7 @@
 
             let id = 'redeem_' + Date.now();
             db.ref('redeem_history/' + id).set({
-                user: currentUser,
+                user: currentUser, // Lưu tên user để phân quyền hiển thị cá nhân
                 telco: telco,
                 amount: amount,
                 costXu: requiredXu,
@@ -634,30 +660,40 @@
             });
         }
 
+        // --- LỊCH SỬ ĐỔI THẺ CÁ NHÂN (CHỈ HIỆN THỊ CỦA CHÍNH USER ĐÓ) ---
         function fetchHistoryFromFirebase() {
             const list = document.getElementById('historyList');
-            list.innerHTML = `<div style="text-align:center; color:#aaa; font-size:12px;">Đang tải lịch sử...</div>`;
+            list.innerHTML = `<div style="text-align:center; color:#aaa; font-size:12px;">Đang tải lịch sử của bạn...</div>`;
             
             db.ref('redeem_history').once('value').then(snapshot => {
                 list.innerHTML = '';
                 const data = snapshot.val();
-                if (!data) { list.innerHTML = `<div style="text-align:center; color:#aaa; font-size:12px;">Chưa có lịch sử đổi NKCARD.</div>`; return; }
+                if (!data) { list.innerHTML = `<div style="text-align:center; color:#aaa; font-size:12px;">Chưa có lịch sử đổi NKCARD nào.</div>`; return; }
 
+                let foundCount = 0;
                 Object.keys(data).reverse().forEach(key => {
                     let item = data[key];
-                    let card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                            <span style="font-family:'Orbitron'; color:#fcee0a; font-size:12px;">${item.amount.toLocaleString()}đ NKCARD</span>
-                            <span style="font-size:11px; font-weight:bold; color:${item.status === 'ĐÃ DUYỆT' ? '#00ff66' : '#ff5555'};">${item.status}</span>
-                        </div>
-                        <p style="font-size:11px; color:#a0aec0;">User: <b style="color:#00f0ff;">${item.user}</b> | Trừ: <b style="color:#fcee0a;">${item.costXu.toLocaleString()} Xu</b></p>
-                        <p style="font-size:11px; color:#a0aec0;">Mã: <b style="color:#00f0ff;">${item.cardCode}</b> | Seri: <b style="color:#00f0ff;">${item.serial}</b></p>
-                        <p style="font-size:9px; color:#6b7280; margin-top:3px;">${item.time}</p>
-                    `;
-                    list.appendChild(card);
+                    // Chỉ lọc và hiển thị đúng lịch sử của tài khoản đang đăng nhập
+                    if (item.user && item.user.toLowerCase() === currentUser.toLowerCase()) {
+                        foundCount++;
+                        let card = document.createElement('div');
+                        card.className = 'card';
+                        card.innerHTML = `
+                            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                                <span style="font-family:'Orbitron'; color:#fcee0a; font-size:12px;">${item.amount.toLocaleString()}đ NKCARD</span>
+                                <span style="font-size:11px; font-weight:bold; color:${item.status === 'ĐÃ DUYỆT' ? '#00ff66' : '#ff5555'};">${item.status}</span>
+                            </div>
+                            <p style="font-size:11px; color:#a0aec0;">Trừ: <b style="color:#fcee0a;">${item.costXu.toLocaleString()} Xu</b></p>
+                            <p style="font-size:11px; color:#a0aec0;">Mã: <b style="color:#00f0ff;">${item.cardCode}</b> | Seri: <b style="color:#00f0ff;">${item.serial}</b></p>
+                            <p style="font-size:9px; color:#6b7280; margin-top:3px;">${item.time}</p>
+                        `;
+                        list.appendChild(card);
+                    }
                 });
+
+                if (foundCount === 0) {
+                    list.innerHTML = `<div style="text-align:center; color:#aaa; font-size:12px;">Bạn chưa thực hiện lệnh đổi thẻ NKCARD nào.</div>`;
+                }
             });
         }
     </script>
